@@ -1,16 +1,14 @@
 from typing import List, Tuple
-from classes.Game.gameClass import game
 
 class playerClass:
-    def __init__(self, strategy: List[(int, int, int)], minBet: int, startingCash: int, shoeReset: bool = False, betMinTuple: Tuple[int, int, int] = (0, 0, 0),):
+    def __init__(self, strategy: List[Tuple[int, int, int]], minBet: int, startingCash: int, betMinTuple: List[int] = (0, 0, 0),):
         '''
         Bets tuple are as follows (Player, Banker, Tie)
         '''
         ## user defined varibles
         self.strategy: List[(int, int, int)] = strategy
         self.Cash: int = startingCash
-        self.shoeReset: bool = shoeReset
-        self.currBetTuple: Tuple[int, int, int] = betMinTuple
+        self.currBetTuple: List[int] = betMinTuple
         self.minBet = minBet
 
         ## utilty variables
@@ -21,7 +19,7 @@ class playerClass:
         self.highestCashRoundReached: int = 0
         self.currentRound: int = 0
         self.strategyOfI: int = 0
-        self.initBetTuple: Tuple[int, int, int] = betMinTuple
+        self.initBetTuple: List[int] = betMinTuple
  
     def incrementWin(self) -> None:
         '''
@@ -55,34 +53,35 @@ class playerClass:
         '''
         keep track of cash and betting amount
         '''
-
+        if self.strategyOfI == len(self.strategy):
+            self.strategyOfI = 0
         # [Player, Banker, Tie]
         self.Cash -= sum(self.currBetTuple)
 
         if winOrLose:
             ## Handle win condition
-            if winOrLose[0] == True:
+            if winOrLose[0] == True and self.strategy[self.strategyOfI][0] == 1:
                 # Bet on player was a win 1:1
-                self.Cash += self.currBet*2
+                self.Cash += self.currBetTuple[0]*2
                 self.currBetTuple[0] = self.initBetTuple[0]
                 self.strategyOfI = 0
-            if winOrLose[1] == True:
+            if winOrLose[1] == True and self.strategy[self.strategyOfI][1] == 1:
                 # Bet on Banker was a win 1:0.95
-                self.Cash += self.currBet*1.95
+                self.Cash += self.currBetTuple[1]*1.95
                 self.currBetTuple[1] = self.initBetTuple[1] 
                 self.strategyOfI = 0
-            if winOrLose[2] == True:
+            if winOrLose[2] == True and self.strategy[self.strategyOfI][2] == 1:
                 # Bet on tie was a win 1:9
-                self.cash += self.currBet*9
+                self.cash += self.currBetTuple[2]*9
                 self.currBetTuple[2] = self.initBetTuple[2]
 
 
             # A lost bet if tie false doesn't matter
-            if winOrLose[0] == False:
+            if winOrLose[0] == False and self.strategy[self.strategyOfI][0] == 1:
                 # Bet on player was a win 1:1
                 self.currBetTuple[0] = self.currBetTuple[0]*2
                 self.strategyOfI += 1
-            if winOrLose[1] == False:
+            if winOrLose[1] == False and self.strategy[self.strategyOfI][1] == 1:
                 # Bet on Banker was a win 1:0.95
                 self.currBetTuple[1] = self.currBetTuple[1]*2 
                 self.strategyOfI += 1
